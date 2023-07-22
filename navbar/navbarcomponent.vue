@@ -1,6 +1,6 @@
 <template>
   <nav class="border-b border-gray-200 bg-white">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-full px-4 sm:px-6 lg:px-8">
       <div class="flex h-12 justify-between">
         <div class="flex">
           <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
