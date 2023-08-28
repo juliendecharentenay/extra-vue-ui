@@ -2,8 +2,9 @@
   <div>
     <div v-for="touch in touches" :key="touch.identifier">
       <svg xmlns="http;//www.w3.org/2000/svg"
-           class="absolute w-10 h-10 -ml-5 -mt-5"
-           :style="{'top': `${touch.clientY.toFixed(0)}px`, 'left': `${touch.clientX.toFixed(0)}px`}"
+           class="absolute" 
+           :style="{'top': `${touch.clientY.toFixed(0)-radius(touch)}px`, 'left': `${touch.clientX.toFixed(0)-radius(touch)}px`,
+                    'width': `${2*radius(touch)}px`, 'height': `${2*radius(touch)}px`}"
            viewBox="-10 -10 20 20"
            stroke-width="1">
         <g :transform="`rotate(${touch.rotationAngle})`">
@@ -44,6 +45,14 @@ export default {
     }
   },
   methods: {
+    radius: function(touch) {
+      try {
+        return Math.max(10, 1.25*touch.radiusX, 1.25*touch.radiusY);
+      } catch (e) {
+        this.on_error("Error in radius", e);
+      }
+      return 10;
+    },
     clearInterval: function() {
       try {
         if (this.interval !== null) {
@@ -59,7 +68,6 @@ export default {
         evt.preventDefault();
         switch (evt.type) {
           case "touchstart":
-          console.log(evt.changedTouches[0]);
             this.touches.push(...evt.changedTouches);
             break;
           case "touchmove":
