@@ -1,8 +1,8 @@
 <template>
   <div>
     <div v-for="touch in touches" :key="touch.identifier">
-      <svg xmlns="http;//www.w3.org/2000/svg"
-           class="absolute" 
+      <svg xmlns="http://www.w3.org/2000/svg"
+           class="absolute z-10" 
            :style="{'top': `${touch.clientY.toFixed(0)-radius(touch)}px`, 'left': `${touch.clientX.toFixed(0)-radius(touch)}px`,
                     'width': `${2*radius(touch)}px`, 'height': `${2*radius(touch)}px`}"
            viewBox="-10 -10 20 20"
@@ -28,64 +28,29 @@
   </div>
 </template>
 <script>
+import { useTouchList } from "@/extras/extra-vue-ui/composable/touchlist.js";
+
 export default {
   name: "TouchAnimation",
-  data: function() {
-    return {
-      touches: [],
-      interval: null,
-    };
+  setup: function() {
+    return useTouchList();
   },
+  props: {
+    default_radius: {
+      type: Number,
+      default: 10,
+    },
+  },
+  data: function() { return {}; },
   emits: ['on_error'],
-  beforeUnmount: function() {
-    try {
-      this.clearInterval();
-    } catch (e) {
-      this.on_error("Error in TouchAnimation::beforeUnmout", e);
-    }
-  },
   methods: {
     radius: function(touch) {
       try {
-        return Math.max(10, 1.25*touch.radiusX, 1.25*touch.radiusY);
+        return Math.max(this.default_radius, 1.25*touch.radiusX, 1.25*touch.radiusY);
       } catch (e) {
         this.on_error("Error in radius", e);
       }
-      return 10;
-    },
-    clearInterval: function() {
-      try {
-        if (this.interval !== null) {
-          clearInterval(this.interval);
-          this.interval = null;
-        }
-      } catch (e) {
-        this.on_error("Error in TouchAnimation::clearInterval", e);
-      }
-    },
-    onTouch: function(evt) {
-      try {
-        evt.preventDefault();
-        switch (evt.type) {
-          case "touchstart":
-            this.touches.push(...evt.changedTouches);
-            break;
-          case "touchmove":
-            for (const touch of evt.changedTouches) {
-              this.touches = this.touches.filter((t) => t.identifier !== touch.identifier);
-            }
-            this.touches.push(...evt.changedTouches);
-            break;
-          case "touchend":
-          case "touchcancel":
-            for (const touch of evt.changedTouches) {
-              this.touches = this.touches.filter((t) => t.identifier !== touch.identifier);
-            }
-            break;
-        }
-      } catch (e) {
-        this.on_error("Error in TouchAnimation::onTouch", e);
-      }
+      return this.default_radius;
     },
     on_error: function(msg, e) {
       this.$emit('on_error', {msg, e});
