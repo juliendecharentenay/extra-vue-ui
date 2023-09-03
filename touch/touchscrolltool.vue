@@ -1,6 +1,4 @@
 <template>
-  <div class="fixed right-5 bottom-5 flex flex-row items-end justify-between">
-    <div>{{ touches.length }}</div>
     <svg xmlns="http://www.w3.org/2000/svg"
          class="w-6/12 lg:w-3/12"
          viewBox="-120 -120 240 240"
@@ -11,7 +9,15 @@
           :key="touch.identifier"
           :transform="rotation(touch)"
           >
-         <line x1="0" y1="-100" x2="0" y2="-110" class="stroke-white opacity-50" />
+         <path class="fill-none stroke-white opacity-50"
+              d="M -34,-84
+                 L -34,-94
+                 A 100,100 0,0,1 34,-94
+                 L 34,-84
+                 M   0,-70
+                 L   0,-100
+                "
+              />
          <path class="fill-slate-200 opacity-25 blur-sm"
                d="M -34,-94
                   A 100,100 0,0,1 34,-94
@@ -25,19 +31,27 @@
                @touchstart="lOnTouch"
                @touchmove="lOnTouch"
                @touchend="lOnTouch"
-               @touchcancel="lOnTouch" />
+               @touchcancel="lOnTouch" 
+               />
        <circle cx="0" cy="0" r="50" class="fill-none stroke-white opacity-25" />
        <circle cx="0" cy="0" r="50" class="fill-white opacity-0"
                @touchstart="() => {}"
                @touchmove="() => {}"
                @touchend="() => {}"
                @touchcancel="() => {}" />
+       <JoyController 
+               @press="(evt) => {$emit('press', evt);}"
+               @release="(evt) => {$emit('release', evt);}"
+               @click="(evt) => {$emit('click', evt);}"
+               @error="({msg, e}) => {on_error(msg, e);}" 
+               />
     </svg>
-  </div>
 </template>
 <script>
 import { useTouchList } from "../composable/touchlist.js";
 import { getAngleDegrees } from "../js/eventpositioning.js";
+
+import JoyController from "./touchscrolltool/joycontroller.vue";
 
 export default {
   name: "TouchScrollTool",
@@ -45,10 +59,9 @@ export default {
     const { touches, onTouch } = useTouchList();
     return { touches, onTouch };
   },
-  emits: [ 'scroll' ],
-  data: function() {
-    return {};
-  },
+  emits: [ 'error', 'scroll', 'click', 'press', 'release' ],
+  data: function() { return {}; },
+  components: { JoyController, },
   props: {
     delta: {
       type: Number,
@@ -73,15 +86,17 @@ export default {
                .map(({touch, angle_end, angle_start}) => ({touch, delta: Math.floor(angle_end/this.delta) - Math.floor(angle_start/this.delta)}))
                .filter(({delta}) => delta !== 0);
         if (scrolls.length > 0) { 
-          navigator.vibrate(100); 
           this.$emit('scroll', {touch: scrolls[0].touch, delta: scrolls[0].delta});
         }
       }
       this.onTouch(evt);
       } catch (e) {
-        console.error(e);
+        this.on_error("Error in lOnTouch", e);
       }
     },
+    on_error: function(msg, e) {
+      this.$emit("error", {msg, e});
+    }
   },
 };
 </script>
