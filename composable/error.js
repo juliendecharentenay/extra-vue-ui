@@ -1,10 +1,11 @@
 import { ref } from "vue";
 
-export function useComponentError(dev, emit) {
+const DEV = true;
+
+export function useComponentError(context) {
   const on_error = ({msg, e}) => {
-    console.error(e);
-    // if (dev) { console.error(e); }
-    // emit('error', {msg, e});
+    if (DEV) { console.error(e); }
+    context.emit('error', {msg, e});
   };
   const catcher = (key, f) => {
     try {
@@ -16,11 +17,11 @@ export function useComponentError(dev, emit) {
   return { on_error, catcher };
 }
 
-export function useError(dev) {
+export function useError() {
   const error = ref(null);
 
   const on_error = ({msg, e}) => {
-    if (dev) { console.error(e); }
+    if (DEV) { console.error(e); }
     if (error.value === null) { error.value = {msg, e}; }
   };
   const catcher = (key, f) => {
