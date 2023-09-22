@@ -51,13 +51,15 @@
 import { useTouchList } from "../composable/touchlist.js";
 import { getAngleDegrees } from "../js/eventpositioning.js";
 
+import { EventScroll } from "./events.js";
+
 import JoyController from "./touchscrolltool/joycontroller.vue";
 
 export default {
   name: "TouchScrollTool",
   setup: function() {
-    const { touches, onTouch } = useTouchList();
-    return { touches, onTouch };
+    const { touches, onTouch, touches_start } = useTouchList();
+    return { touches, onTouch, touches_start };
   },
   emits: [ 'error', 'scroll', 'click', 'press', 'release' ],
   data: function() { return {}; },
@@ -83,10 +85,10 @@ export default {
         let changedTouches = []; for (const touch of evt.changedTouches) { changedTouches.push(touch); }
         let scrolls = changedTouches
                .map((touch) => ({touch, angle_end: getAngleDegrees(touch), angle_start: getAngleDegrees(this.touches.find((t) => t.identifier === touch.identifier))}))
-               .map(({touch, angle_end, angle_start}) => ({touch, delta: Math.floor(angle_end/this.delta) - Math.floor(angle_start/this.delta)}))
+               .map(({touch, angle_end, angle_start}) => ({touch, angle_end, angle_start, delta: Math.floor(angle_end/this.delta) - Math.floor(angle_start/this.delta)}))
                .filter(({delta}) => delta !== 0);
         if (scrolls.length > 0) { 
-          this.$emit('scroll', {touch: scrolls[0].touch, delta: scrolls[0].delta});
+          this.$emit('scroll', new EventScroll(scrolls[0].touch, scrolls[0].delta, getAngleDegrees(this.touches_start[scrolls[0].touch.identifier])));
         }
       }
       this.onTouch(evt);
