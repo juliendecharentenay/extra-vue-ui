@@ -5,6 +5,18 @@
          stroke-width="1"
          ref="svg"
          >
+       <g class="fill-none stroke-white"
+          :class="{'opacity-25': touches.length > 0,
+                   'opacity-75': touches.length === 0,
+                  }">
+         <g v-for="angle in [0, -90, -225]"
+            :key="angle"
+            :transform="`translate(0, -75) rotate(${angle}, 0, 75)`"
+            >
+           <g transform="translate(-3, 0)"><path stroke-linecap="round" stroke-linejoin="round" d="M0.0 7.5 l -7.5 -7.5 l 7.5-7.5" /></g>
+           <g transform="scale(-1) translate(-3, 0)"><path stroke-linecap="round" stroke-linejoin="round" d="M0.0 7.5 l -7.5 -7.5 l 7.5-7.5" /></g>
+         </g>
+       </g>
        <g v-for="touch in touches"
           :key="touch.identifier"
           :transform="rotation(touch)"
