@@ -7,12 +7,13 @@ export function useComponentError(context) {
     if (DEV) { console.error(e); }
     context.emit('error', {msg, e});
   };
-  const catcher = (key, f) => {
+  const catcher = (key, f, d = null) => {
     try {
-      f();
+      return f();
     } catch (e) {
       on_error({msg: `Error in ${key}`, e});
     }
+    return d;
   };
   return { on_error, catcher };
 }
@@ -24,12 +25,13 @@ export function useError() {
     if (DEV) { console.error(e); }
     if (error.value === null) { error.value = {msg, e}; }
   };
-  const catcher = (key, f) => {
+  const catcher = (key, f, d = null) => {
     try {
-      f();
+      return f();
     } catch (e) {
       on_error({msg: `Error in ${key}`, e});
     }
+    return d;
   };
   return { error, on_error, catcher };
 }

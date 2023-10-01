@@ -97,6 +97,11 @@ export default {
         let changedTouches = []; for (const touch of evt.changedTouches) { changedTouches.push(touch); }
         let scrolls = changedTouches
                .map((touch) => ({touch, angle_end: getAngleDegrees(touch), angle_start: getAngleDegrees(this.touches.find((t) => t.identifier === touch.identifier))}))
+               .map(({touch, angle_end, angle_start}) => {
+                 // Handle the transition at -180/180.
+                 if (angle_end * angle_start < (-45.0 * 45.0)) { angle_end += Math.sign(angle_start)*360.0; }
+                 return {touch, angle_end, angle_start};
+               })
                .map(({touch, angle_end, angle_start}) => ({touch, angle_end, angle_start, delta: Math.floor(angle_end/this.delta) - Math.floor(angle_start/this.delta)}))
                .filter(({delta}) => delta !== 0);
         if (scrolls.length > 0) { 
