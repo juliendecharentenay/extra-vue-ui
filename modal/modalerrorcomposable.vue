@@ -1,7 +1,15 @@
 <template>
   <ModalError @dismiss="$emit('dismiss')">
     <template #message>{{ error.msg }}</template>
-    <template #error>{{ error.e }}</template>
+    <template #error>
+      <div v-if="typeof error.e.message === 'function'">
+        {{ error.e.message() }}
+        {{ error.e.cause() }}
+      </div>
+      <div v-else>
+        {{ error.e }}
+      </div>
+    </template>
   </ModalError>
 </template>
 <script>
