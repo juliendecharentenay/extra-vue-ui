@@ -1,6 +1,6 @@
 <template>
     <svg xmlns="http://www.w3.org/2000/svg"
-         class="w-6/12 lg:w-3/12"
+         class="w-6/12"
          viewBox="-120 -120 240 240"
          stroke-width="1"
          ref="svg"
