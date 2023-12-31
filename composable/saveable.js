@@ -12,11 +12,9 @@ export function useSaveable() {
 
   const on_save = () => {
     save_state.value = "Saving";
-    console.log("Trigger save");
     if (short_timeout !== null) { clearTimeout(short_timeout); short_timeout = null; }
     if (long_timeout !== null) { clearTimeout(long_timeout); long_timeout = null; }
     if (save_f !== null) { 
-      console.log("Call save");
       save_f(); 
       save_state.value = "saved";
       setTimeout(() => {if (save_state.value === "saved") { save_state.value = null; }}, 1500);
